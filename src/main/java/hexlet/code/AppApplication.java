@@ -3,11 +3,16 @@ package hexlet.code;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@EnableJpaAuditing
 @SpringBootApplication
-public class AppApplication {
+public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
+    @Bean
+    public Faker getFaker() {
+        return new Faker(new Locale("en", "US"));
+    }
 }
