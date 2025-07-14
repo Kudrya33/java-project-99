@@ -6,6 +6,7 @@ plugins {
 	id("org.springframework.boot") version "4.0.0-SNAPSHOT"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.freefair.lombok") version "8.12.1"
+	id("org.sonarqube") version "6.2.0.5505"
 }
 
 group = "hexlet.code"
@@ -60,4 +61,12 @@ tasks.test {
 
 tasks.jacocoTestReport {
 	reports { xml.required.set(true) }
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "Kudrya33_java-project-99")
+		property("sonar.organization", "pavel-kudrya")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
 }
