@@ -14,9 +14,10 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.7
+          fetch-depth: 0
       - name: Execute Gradle build
         run: ./gradlew build
       - name: Generate coverage report
@@ -33,10 +34,7 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        run: ./gradlew build sonar --info
+        run: ./gradlew sonar --info
