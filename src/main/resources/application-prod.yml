@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    database: 'java_project_99_postgres'
+    db-port: '5432'
+    host: 'dpg-d1qi4cnfte5s73dcugs0-a'
+    username: "java_project_99_postgres_user"
+    password: "v8tsSenCYUtxg6E2hlRRbFDkprr0XgMT"
+    jdbc_database_url: 'jdbc:postgresql://java_project_99_postgres_user:v8tsSenCYUtxg6E2hlRRbFDkprr0XgMT@dpg-d1qi4cnfte5s73dcugs0-a/java_project_99_postgres'
