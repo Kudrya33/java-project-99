@@ -47,4 +47,5 @@ public class User {
 
     @LastModifiedDate
     private LocalDate updatedAt;
+
 }
