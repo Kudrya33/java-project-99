@@ -96,9 +96,9 @@ public class TestUser {
     public void testCreate() throws Exception {
         Map<String, String> data = new HashMap<>();
         data.put("email", "email@list.com");
-        data.put("password", "ogo");
-        data.put("firstName", "Alex");
-        data.put("lastName", "Wang");
+        data.put("password", "xxx");
+        data.put("firstName", "Pavel");
+        data.put("lastName", "Kud");
 
         MvcResult result = mockWvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(data)).with(jwt()))
