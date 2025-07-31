@@ -2,6 +2,7 @@ package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
@@ -38,6 +39,9 @@ public class TestUser {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private MockMvc mockWvc;
 
     @Autowired
@@ -50,11 +54,13 @@ public class TestUser {
 
     @BeforeEach
     public void repositoryPrepare() {
+        taskRepository.deleteAll();
         userRepository.deleteAll();
         user = Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
                 .ignore(Select.field(User::getCreatedAt))
                 .ignore(Select.field(User::getUpdatedAt))
+                .ignore(Select.field(User::getTasks))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .create();
         userRepository.save(user);
@@ -96,9 +102,9 @@ public class TestUser {
     public void testCreate() throws Exception {
         Map<String, String> data = new HashMap<>();
         data.put("email", "email@list.com");
-        data.put("password", "xxx");
+        data.put("password", "exe");
         data.put("firstName", "Pavel");
-        data.put("lastName", "Kud");
+        data.put("lastName", "Kudrya");
 
         MvcResult result = mockWvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(data)).with(jwt()))
