@@ -1,6 +1,8 @@
 package hexlet.code;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.taskDto.TaskDto;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -21,10 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -126,12 +125,31 @@ public class TestTask {
 
     @Test
     public void testIndex() throws Exception {
+        List<Task> expectedTasks = taskRepository.findAll();
+
         MvcResult result = mockMvc.perform(get("/api/tasks").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        List<TaskDto> taskDtos = om.readValue(body, new TypeReference<>() {});
+
+        List<Task> actualTasks = taskDtos.stream()
+                .map(dto -> {
+                    Task task = new Task();
+                    task.setId(dto.getId());
+                    task.setName(dto.getTitle());
+                    task.setDescription(dto.getContent());
+                    task.setIndex(dto.getIndex());
+                    task.setCreatedAt(dto.getCreatedAt());
+                    return task;
+                })
+                .toList();
+
+        assertThat(actualTasks)
+                .usingRecursiveComparison()
+                .ignoringFields("assignee", "taskStatus", "taskLabel")
+                .isEqualTo(expectedTasks);
     }
 
     @Test

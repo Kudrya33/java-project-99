@@ -1,6 +1,8 @@
 package hexlet.code;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.userDto.UserDto;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -30,10 +33,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TestUser {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private UserRepository userRepository;
@@ -77,12 +82,31 @@ public class TestUser {
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult result = mockWvc.perform(get("/api/users").with(jwt()))
+        List<User> expectedUsers = userRepository.findAll();
+
+        MvcResult result = mockMvc.perform(get("/api/users").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        List<UserDto> userDtos = om.readValue(body, new TypeReference<>() {});
+
+        List<User> actualUsers = userDtos.stream()
+                .map(dto -> {
+                    User user = new User();
+                    user.setId(dto.getId());
+                    user.setEmail(dto.getEmail());
+                    user.setFirstName(dto.getFirstName());
+                    user.setLastName(dto.getLastName());
+                    user.setCreatedAt(dto.getCreatedAt());
+                    return user;
+                })
+                .toList();
+
+        assertThat(actualUsers)
+                .usingRecursiveComparison()
+                .ignoringFields("password", "updatedAt")
+                .isEqualTo(expectedUsers);
     }
 
     @Test

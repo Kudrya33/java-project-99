@@ -1,6 +1,8 @@
 package hexlet.code;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.labelDto.LabelDto;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -58,12 +61,28 @@ public class TestLabel {
 
     @Test
     public void testIndex() throws Exception {
+        List<Label> expectedLabels = labelRepository.findAll();
+
         MvcResult result = mockMvc.perform(get("/api/labels").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        List<LabelDto> labelDtos = om.readValue(body, new TypeReference<>() {});
+
+        List<Label> actualLabels = labelDtos.stream()
+                .map(dto -> {
+                    Label label = new Label();
+                    label.setId(dto.getId());
+                    label.setName(dto.getName());
+                    label.setCreatedAt(dto.getCreatedAt());
+                    return label;
+                })
+                .toList();
+
+        assertThat(actualLabels)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedLabels);
     }
 
     @Test

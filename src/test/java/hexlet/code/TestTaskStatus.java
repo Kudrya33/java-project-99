@@ -1,6 +1,8 @@
 package hexlet.code;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.taskStatusDto.TaskStatusDto;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -58,12 +61,29 @@ public class TestTaskStatus {
 
     @Test
     public void testIndex() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/api/task_statuses").with(jwt()))
+        List<TaskStatus> expectedStatuses = taskStatusRepository.findAll();
+
+        MvcResult result = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String body = mvcResult.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        String body = result.getResponse().getContentAsString();
+        List<TaskStatusDto> statusDtos = om.readValue(body, new TypeReference<>() {});
+
+        List<TaskStatus> actualStatuses = statusDtos.stream()
+                .map(dto -> {
+                    TaskStatus status = new TaskStatus();
+                    status.setId(dto.getId());
+                    status.setName(dto.getName());
+                    status.setSlug(dto.getSlug());
+                    status.setCreatedAt(dto.getCreatedAt());
+                    return status;
+                })
+                .toList();
+
+        assertThat(actualStatuses)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedStatuses);
     }
 
     @Test
