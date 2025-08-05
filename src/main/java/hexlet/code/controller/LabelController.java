@@ -28,12 +28,14 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:8080"}, exposedHeaders = "X-Total-Count")
 @RequestMapping("/api/labels")
 public class LabelController {
+    private final LabelRepository labelRepository;
+    private final LabelMapper labelMapper;
 
     @Autowired
-    private LabelRepository labelRepository;
-
-    @Autowired
-    private LabelMapper labelMapper;
+    public LabelController(LabelRepository labelRepository, LabelMapper labelMapper) {
+        this.labelRepository = labelRepository;
+        this.labelMapper = labelMapper;
+    }
 
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)

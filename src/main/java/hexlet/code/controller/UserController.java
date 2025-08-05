@@ -28,12 +28,14 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:8080"}, exposedHeaders = "X-Total-Count")
 @RequestMapping("/api/users")
 public class UserController {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
+    public UserController(UserRepository userRepository, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
 
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)

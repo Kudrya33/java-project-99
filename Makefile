@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := build-run
 
+.PHONY: clean build install run-dist run test report lint update-deps
+
 clean:
 	./gradlew clean
 

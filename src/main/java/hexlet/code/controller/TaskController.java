@@ -30,15 +30,18 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:8080"}, exposedHeaders = "X-Total-Count")
 @RequestMapping("/api/tasks")
 public class TaskController {
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+    private final TaskSpecification taskSpecification;
 
     @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TaskMapper taskMapper;
-
-    @Autowired
-    private TaskSpecification taskSpecification;
+    public TaskController(TaskRepository taskRepository,
+                          TaskMapper taskMapper,
+                          TaskSpecification taskSpecification) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+        this.taskSpecification = taskSpecification;
+    }
 
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)

@@ -8,27 +8,28 @@ import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final TaskStatusRepository taskStatusRepository;
+    private final LabelRepository labelRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private TaskStatusRepository taskStatusRepository;
-
-    @Autowired
-    private LabelRepository labelRepository;
+    public DataInitializer(UserRepository userRepository,
+                           UserMapper userMapper,
+                           TaskStatusRepository taskStatusRepository,
+                           LabelRepository labelRepository) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.taskStatusRepository = taskStatusRepository;
+        this.labelRepository = labelRepository;
+    }
 
     @Override
     public void run(ApplicationArguments args) {
