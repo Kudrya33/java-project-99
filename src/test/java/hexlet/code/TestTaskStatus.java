@@ -68,7 +68,7 @@ public class TestTaskStatus {
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        List<TaskStatusDto> statusDtos = om.readValue(body, new TypeReference<>() {});
+        List<TaskStatusDto> statusDtos = om.readValue(body, new TypeReference<>() { });
 
         List<TaskStatus> actualStatuses = statusDtos.stream()
                 .map(dto -> {

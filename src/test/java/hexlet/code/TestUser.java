@@ -89,7 +89,7 @@ public class TestUser {
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        List<UserDto> userDtos = om.readValue(body, new TypeReference<>() {});
+        List<UserDto> userDtos = om.readValue(body, new TypeReference<>() { });
 
         List<User> actualUsers = userDtos.stream()
                 .map(dto -> {

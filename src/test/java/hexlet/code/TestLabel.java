@@ -68,7 +68,7 @@ public class TestLabel {
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        List<LabelDto> labelDtos = om.readValue(body, new TypeReference<>() {});
+        List<LabelDto> labelDtos = om.readValue(body, new TypeReference<>() { });
 
         List<Label> actualLabels = labelDtos.stream()
                 .map(dto -> {

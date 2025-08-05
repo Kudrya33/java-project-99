@@ -23,7 +23,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -132,7 +136,7 @@ public class TestTask {
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        List<TaskDto> taskDtos = om.readValue(body, new TypeReference<>() {});
+        List<TaskDto> taskDtos = om.readValue(body, new TypeReference<>() { });
 
         List<Task> actualTasks = taskDtos.stream()
                 .map(dto -> {
