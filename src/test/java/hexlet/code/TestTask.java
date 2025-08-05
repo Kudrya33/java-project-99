@@ -21,18 +21,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -83,25 +80,25 @@ public class TestTask {
 
         taskStatus = Instancio.of(TaskStatus.class)
                 .ignore(Select.field(TaskStatus::getId))
-                .ignore(Select.field((TaskStatus::getCreatedAt)))
+                .ignore(Select.field(TaskStatus::getCreatedAt))
                 .create();
 
         taskStatusForFilter = Instancio.of(TaskStatus.class)
                 .ignore(Select.field(TaskStatus::getId))
-                .ignore(Select.field((TaskStatus::getCreatedAt)))
+                .ignore(Select.field(TaskStatus::getCreatedAt))
                 .create();
 
         label = Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
                 .ignore(Select.field(Label::getCreatedAt))
-                .ignore(Select.field(Label::getTasks))
                 .create();
 
         labelRepository.save(label);
         userRepository.save(user);
         taskStatusRepository.save(taskStatus);
+        taskStatusRepository.save(taskStatusForFilter);
 
-        List<Label> labels = new ArrayList<>();
+        Set<Label> labels = new HashSet<>();
         labels.add(label);
 
         task = Instancio.of(Task.class)
@@ -121,6 +118,7 @@ public class TestTask {
                 .create();
 
         taskRepository.save(task);
+        taskRepository.save(taskFilter);
     }
 
     @Test
@@ -140,9 +138,11 @@ public class TestTask {
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        assertThatJson(body).and(t -> t.node("index").isEqualTo(task.getIndex()),
+        assertThatJson(body).and(
+                t -> t.node("index").isEqualTo(task.getIndex()),
                 t -> t.node("status").isEqualTo(taskStatus.getSlug()),
-                t -> t.node("assignee_id").isEqualTo(user.getId()));
+                t -> t.node("assignee_id").isEqualTo(user.getId())
+        );
     }
 
     @Test
@@ -154,17 +154,18 @@ public class TestTask {
         data.put("status", taskStatus.getSlug());
 
         MvcResult result = mockMvc.perform(post("/api/tasks").with(jwt())
-                        .contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(data)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Task resultTusk = taskRepository.findByName("Some Title").get();
+        Task resultTask = taskRepository.findByName("Some Title").get();
 
         String body = result.getResponse().getContentAsString();
         assertThatJson(body).and(t -> t.node("index").isEqualTo("12345"));
-        assertThat(resultTusk.getCreatedAt()).isNotNull();
-        assertThat(resultTusk.getDescription()).isNull();
-        assertThat(resultTusk.getName()).isEqualTo("Some Title");
+        assertThat(resultTask.getCreatedAt()).isNotNull();
+        assertThat(resultTask.getDescription()).isNull();
+        assertThat(resultTask.getName()).isEqualTo("Some Title");
     }
 
     @Test
@@ -174,21 +175,22 @@ public class TestTask {
         data.put("content", "New content");
 
         MvcResult result = mockMvc.perform(put("/api/tasks/" + task.getId()).with(jwt())
-                        .contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(data)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String body = result.getResponse().getContentAsString();
-        assertThatJson(body).and(t -> t.node("title").isEqualTo("New title"));
-        assertThatJson(body).and(t -> t.node("content").isEqualTo("New content"));
+        assertThatJson(body).and(
+                t -> t.node("title").isEqualTo("New title"),
+                t -> t.node("content").isEqualTo("New content")
+        );
     }
 
     @Test
     public void testDelete() throws Exception {
-
-        MvcResult result = mockMvc.perform(delete("/api/tasks/" + task.getId()).with(jwt()))
-                .andExpect(status().isNoContent())
-                .andReturn();
+        mockMvc.perform(delete("/api/tasks/" + task.getId()).with(jwt()))
+                .andExpect(status().isNoContent());
 
         assertThat(taskRepository.existsById(task.getId())).isFalse();
     }
@@ -200,7 +202,8 @@ public class TestTask {
         data.put("status", taskStatus.getSlug());
 
         MvcResult result = mockMvc.perform(get("/api/tasks").with(jwt())
-                        .contentType(MediaType.TEXT_HTML).content(om.writeValueAsString(data)))
+                        .param("assigneeId", String.valueOf(user.getId()))
+                        .param("status", taskStatus.getSlug()))
                 .andExpect(status().isOk())
                 .andReturn();
 

@@ -60,7 +60,6 @@ public class TestUser {
                 .ignore(Select.field(User::getId))
                 .ignore(Select.field(User::getCreatedAt))
                 .ignore(Select.field(User::getUpdatedAt))
-                .ignore(Select.field(User::getTasks))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .create();
         userRepository.save(user);

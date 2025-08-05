@@ -14,6 +14,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(
         uses = { JsonNullableMapper.class, ReferenceMapper.class },
@@ -26,7 +28,7 @@ public abstract class TaskMapper {
     @Mapping(source = "assigneeId", target = "assignee")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "taskLabelIds", target = "taskLabel")
+    @Mapping(source = "taskLabelIds", target = "taskLabel", qualifiedByName = "mapLabels")
     public abstract Task map(TaskCreateDto data);
 
     @Mapping(source = "assignee.id", target = "assigneeId")
@@ -40,11 +42,22 @@ public abstract class TaskMapper {
     @Mapping(source = "status", target = "taskStatus")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "taskLabelIds", target = "taskLabel")
+    @Mapping(source = "taskLabelIds", target = "taskLabel", qualifiedByName = "mapLabels")
     public abstract void update(TaskUpdateDto data, @MappingTarget Task task);
 
     @Named("mapTaskLabel")
-    List<Long> mapTaskLabel(List<Label> labels) {
-        return labels == null ? null : labels.stream().map(Label::getId).toList();
+    List<Long> mapTaskLabel(Set<Label> labels) {
+        return labels == null ? null : labels.stream().map(Label::getId).collect(Collectors.toList());
+    }
+
+    @Named("mapLabels")
+    Set<Label> mapLabels(List<Long> ids) {
+        return ids == null ? null : ids.stream()
+                .map(id -> {
+                    Label label = new Label();
+                    label.setId(id);
+                    return label;
+                })
+                .collect(Collectors.toSet());
     }
 }

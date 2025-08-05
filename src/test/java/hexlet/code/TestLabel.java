@@ -51,7 +51,6 @@ public class TestLabel {
         label = Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
                 .ignore(Select.field(Label::getCreatedAt))
-                .ignore(Select.field(Label::getTasks))
                 .create();
 
         labelRepository.save(label);

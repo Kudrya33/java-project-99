@@ -52,7 +52,6 @@ public class TestTaskStatus {
         taskStatus = Instancio.of(TaskStatus.class)
                 .ignore(Select.field(TaskStatus::getId))
                 .ignore(Select.field((TaskStatus::getCreatedAt)))
-                .ignore(Select.field(TaskStatus::getTasks))
                 .create();
         taskStatusRepository.save(taskStatus);
     }
