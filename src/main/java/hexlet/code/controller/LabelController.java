@@ -4,7 +4,6 @@ import hexlet.code.dto.labelDto.LabelCreateDto;
 import hexlet.code.dto.labelDto.LabelDto;
 import hexlet.code.dto.labelDto.LabelUpdateDto;
 import hexlet.code.exeption.ResourceNotFoundException;
-import hexlet.code.exeption.UnprocessableEntity;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
@@ -78,10 +77,6 @@ public class LabelController {
     public void delete(@PathVariable long id) {
         Label label = labelRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("label with id " + id + " not found"));
-        try {
-            labelRepository.delete(label);
-        } catch (Exception e) {
-            throw new UnprocessableEntity("Cannot be completed, label connected with task");
-        }
+        labelRepository.delete(label);
     }
 }

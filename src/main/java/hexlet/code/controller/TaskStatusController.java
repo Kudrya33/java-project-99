@@ -4,7 +4,6 @@ import hexlet.code.dto.taskStatusDto.TaskStatusCreateDto;
 import hexlet.code.dto.taskStatusDto.TaskStatusDto;
 import hexlet.code.dto.taskStatusDto.TaskStatusUpdateDto;
 import hexlet.code.exeption.ResourceNotFoundException;
-import hexlet.code.exeption.UnprocessableEntity;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
@@ -76,10 +75,6 @@ public class TaskStatusController {
     public void delete(@PathVariable long id) {
         TaskStatus taskStatus = taskStatusRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Task Status with id " + id + " not found"));
-        try {
-            taskStatusRepository.delete(taskStatus);
-        } catch (Exception e) {
-            throw new UnprocessableEntity("Cannot be completed, status connected with task");
-        }
+        taskStatusRepository.delete(taskStatus);
     }
 }
