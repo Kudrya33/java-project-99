@@ -2,7 +2,6 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.AuthRequest;
 import hexlet.code.util.JWTUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,6 @@ public class AuthenticationController {
     private final JWTUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
-    @Autowired
     public AuthenticationController(JWTUtils jwtUtils,
                                     AuthenticationManager authenticationManager) {
         this.jwtUtils = jwtUtils;
